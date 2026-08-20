@@ -18,7 +18,7 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const endpoint = role === 'admin' ? '/admin/signup' : '/user/signup';
+      const endpoint = role === 'admin' ? '/api/v1/admin/signup' : '/api/v1/user/signup';
       await API.post(endpoint, { username, password });
       
       alert('Registration successful! Please log in.');
