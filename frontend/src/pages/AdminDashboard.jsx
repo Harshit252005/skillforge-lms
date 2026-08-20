@@ -198,7 +198,7 @@ export default function AdminDashboard() {
                 <div className="flex-1 text-center sm:text-left">
                   <h3 className="font-bold text-white">{course.title}</h3>
                   <p className="text-slate-400 text-xs line-clamp-1">{course.description}</p>
-                  <span className="text-indigo-400 font-bold text-sm">${course.price}</span>
+                  <span className="text-indigo-400 font-bold text-sm">₹{course.price}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button

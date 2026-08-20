@@ -141,7 +141,7 @@ export default function CourseDetails() {
           
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Price</span>
-            <span className="text-3xl font-black text-indigo-400">${course.price}</span>
+            <span className="text-3xl font-black text-indigo-400">₹{course.price}</span>
           </div>
 
           {isPurchased ? (

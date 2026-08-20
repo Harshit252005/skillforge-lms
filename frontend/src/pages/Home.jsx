@@ -136,7 +136,7 @@ export default function Home() {
                   </div>
 
                   <div className="flex items-center justify-between border-t border-slate-700/60 pt-4">
-                    <span className="text-2xl font-black text-indigo-400">${course.price}</span>
+                    <span className="text-2xl font-black text-indigo-400">₹{course.price}</span>
                     {isPurchased ? (
                       <span className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl text-sm font-semibold">
                         <CheckCircle2 className="w-4 h-4" /> Enrolled
