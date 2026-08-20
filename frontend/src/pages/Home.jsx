@@ -143,10 +143,10 @@ export default function Home() {
                       </span>
                     ) : (
                       <button
-                        onClick={() => handlePurchase(course._id)}
+                        onClick={() => navigate(`/course-details/${course._id}`)}
                         className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-indigo-600/30"
                       >
-                        <ShoppingCart className="w-4 h-4" /> Enroll Now
+                        View Course & Enroll
                       </button>
                     )}
                   </div>

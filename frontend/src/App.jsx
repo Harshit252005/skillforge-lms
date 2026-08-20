@@ -9,6 +9,7 @@ import Signup from './pages/Signup';
 import MyCourses from './pages/MyCourses';
 import CoursePlayer from './pages/CoursePlayer';
 import AdminDashboard from './pages/AdminDashboard';
+import CourseDetails from './pages/CourseDetails';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/course-details/:courseId" element={<CourseDetails />} />
 
               <Route
                 path="/my-courses"
