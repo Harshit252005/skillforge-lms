@@ -19,7 +19,7 @@ app.use(helmet());
 
 // 2. Enable CORS so React on port 5173 can talk to Express on port 3000
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "https://skillforge-lms-eight.vercel.app",
     credentials: true
 }));
 
