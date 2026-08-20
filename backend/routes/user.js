@@ -13,15 +13,41 @@ const {
     createRazorpayOrder 
 } = require("../controllers/userController");
 
+// Import Redis Client
+const redisClient = require("../redisClient");
+const { Course } = require("../db"); // Adjust path to your Course model if needed
 
-userRouter.get("/courses/:courseId", getCourseById);
 // Define URLs (Routes)
 userRouter.post("/signup", signupUser);
 userRouter.post("/login", loginUser);
-userRouter.get("/courses", getAllCourses);
+
+// GET all courses with Redis Caching
+userRouter.get("/courses", async (req, res) => {
+    try {
+        // 1. Check if courses are cached in Redis RAM
+        const cachedCourses = await redisClient.get('all_courses');
+        
+        if (cachedCourses) {
+            console.log('Serving courses from Redis Cache 🚀');
+            return res.json({ courses: JSON.parse(cachedCourses) });
+        }
+
+        // 2. If not cached, fetch from MongoDB
+        const courses = await Course.find({});
+
+        // 3. Store in Redis cache for 60 seconds
+        await redisClient.setEx('all_courses', 60, JSON.stringify(courses));
+
+        console.log('Serving courses from MongoDB 🐢');
+        res.json({ courses });
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching courses", error: err.message });
+    }
+});
+
+userRouter.get("/courses/:courseId", getCourseById);
 userRouter.post("/courses/:courseId", userMiddleware, purchaseCourse);
 userRouter.get("/purchasedCourses", userMiddleware, getPurchasedCourses);
-
 userRouter.post("/create-order", userMiddleware, createRazorpayOrder);
 
 module.exports = { userRouter };

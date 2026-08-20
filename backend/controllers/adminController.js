@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin"); 
 const Course = require("../models/Course");
+const redisClient = require('../redisClient');
 const { signupSchema, courseSchema } = require("../zodSchemas");
 
 const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || "fallback_admin_secret_key_123";
@@ -54,12 +55,11 @@ const loginAdmin = async (req, res) => {
     }
 };
 
-// 3. Create Course Controller (Now with Cloudinary Image Upload)
+// 3. Create Course Controller (Now with Cloudinary Image Upload & Redis Invalidation)
 const createCourse = async (req, res) => {
     console.log("WHAT POSTMAN SENT:", req.body);
     const { title, description, price } = req.body;
     
-    // Because we used .fields(), files are now inside an object arrays!
     const imageLink = req.files?.thumbnail ? req.files.thumbnail[0].path : null;
     const videoLink = req.files?.video ? req.files.video[0].path : null;
 
@@ -73,10 +73,13 @@ const createCourse = async (req, res) => {
             description,
             price: Number(price),
             imageLink,
-            videoLink, // 👈 WE SAVE THE VIDEO TO MONGODB HERE!
+            videoLink,
             creatorId: req.adminId, 
             modules: [] 
         });
+
+        // 🚀 Clear cache so the new course appears instantly for students
+        await redisClient.del('all_courses');
 
         res.json({ message: "Course created successfully", courseId: newCourse._id });
     } catch (e) {
@@ -87,6 +90,7 @@ const createCourse = async (req, res) => {
         });
     }
 };
+
 // 4. Get All Admin Courses Controller
 const getAdminCourses = async (req, res) => {
     try {
@@ -97,30 +101,26 @@ const getAdminCourses = async (req, res) => {
     }
 };
 
-// 5. Update Course Controller
+// 5. Update Course Controller (With Redis Invalidation)
 const updateCourse = async (req, res) => {
     const { courseId } = req.params;
     const { title, description, price } = req.body;
 
     try {
-        // 1. Build an object with the text fields we know we are updating
         const updateData = {
             title,
             description,
             price: Number(price)
         };
 
-        // 2. ONLY update the image if a new one was actually uploaded
         if (req.files && req.files.thumbnail) {
             updateData.imageLink = req.files.thumbnail[0].path;
         }
 
-        // 3. ONLY update the video if a new one was actually uploaded
         if (req.files && req.files.video) {
             updateData.videoLink = req.files.video[0].path;
         }
 
-        // 4. Send the dynamic updateData to MongoDB
         const updatedCourse = await Course.findOneAndUpdate(
             { _id: courseId, creatorId: req.adminId },
             updateData,
@@ -131,6 +131,9 @@ const updateCourse = async (req, res) => {
             return res.status(404).json({ message: "Course not found or unauthorized" });
         }
 
+        // 🚀 Clear cache on update
+        await redisClient.del('all_courses');
+
         res.json({ message: "Course updated successfully", course: updatedCourse });
     } catch (e) {
         console.error("UPDATE ERROR:", e);
@@ -138,7 +141,7 @@ const updateCourse = async (req, res) => {
     }
 };
 
-// 6. Delete Course Controller
+// 6. Delete Course Controller (With Redis Invalidation)
 const deleteCourse = async (req, res) => {
     const { courseId } = req.params;
 
@@ -148,6 +151,9 @@ const deleteCourse = async (req, res) => {
         if (!deletedCourse) {
             return res.status(404).json({ message: "Course not found or unauthorized" });
         }
+
+        // 🚀 Clear cache on delete
+        await redisClient.del('all_courses');
 
         res.json({ message: "Course deleted successfully" });
     } catch (e) {
@@ -160,7 +166,6 @@ const addLesson = async (req, res) => {
     const { courseId } = req.params;
     const { moduleTitle, lessonTitle, lessonDescription, order } = req.body;
     
-    // Cloudinary attaches the uploaded video info to req.file
     const videoUrl = req.file ? req.file.path : null;
 
     if (!videoUrl) {
@@ -174,7 +179,6 @@ const addLesson = async (req, res) => {
             return res.status(404).json({ message: "Course not found or unauthorized" });
         }
 
-        // Check if the module already exists, if not, create it
         let moduleIndex = course.modules.findIndex(m => m.title === moduleTitle);
         
         if (moduleIndex === -1) {
@@ -182,7 +186,6 @@ const addLesson = async (req, res) => {
             moduleIndex = course.modules.length - 1;
         }
 
-        // Push the new video lesson into the correct module
         course.modules[moduleIndex].lessons.push({
             title: lessonTitle,
             description: lessonDescription,
