@@ -1,38 +1,56 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import StudentClassroom from './components/StudentClassroom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
 
-// Admin Components
-import AdminSignup from './components/AdminSignup';
-import AdminLogin from './components/AdminLogin';
-import AdminDashboard from './components/AdminDashboard';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import MyCourses from './pages/MyCourses';
+import CoursePlayer from './pages/CoursePlayer';
+import AdminDashboard from './pages/AdminDashboard';
 
-// Student Components (We will create these next)
-import UserSignup from './components/UserSignup';
-import UserLogin from './components/UserLogin';
-import UserDashboard from './components/UserDashboard';
-
-function App() {
+export default function App() {
   return (
-    <BrowserRouter>
-      <div className="flex min-h-screen w-full items-center justify-center bg-slate-900 py-12 px-4">
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          
-          {/* Admin routes must be strictly wrapped inside <Routes> */}
-          <Route path="/signup" element={<AdminSignup />} />
-          <Route path="/login" element={<AdminLogin />} />
-          <Route path="/dashboard" element={<AdminDashboard />} />
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
 
-          {/* Student routes */}
-          <Route path="/student/signup" element={<UserSignup />} />
-          <Route path="/student/login" element={<UserLogin />} />
-          <Route path="/student/dashboard" element={<UserDashboard />} />
-          <Route path="/student/course/:courseId" element={<StudentClassroom />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+              <Route
+                path="/my-courses"
+                element={
+                  <ProtectedRoute allowedRole="user">
+                    <MyCourses />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/course/:courseId"
+                element={
+                  <ProtectedRoute allowedRole="user">
+                    <CoursePlayer />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <ProtectedRoute allowedRole="admin">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
-
-export default App;
