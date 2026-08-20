@@ -21,7 +21,7 @@ export default function Home() {
 
   const fetchCourses = async () => {
     try {
-      const res = await API.get('/user/courses');
+      const res = await API.get('/api/v1/user/courses');
       setCourses(res.data.courses || []);
     } catch (err) {
       setError('Failed to load courses.');
@@ -32,7 +32,7 @@ export default function Home() {
 
   const fetchPurchasedCourses = async () => {
     try {
-      const res = await API.get('/user/purchasedCourses');
+      const res = await API.get('/api/v1/user/purchasedCourses');
       const ids = (res.data.purchasedCourses || []).map((c) => c._id);
       setPurchasedIds(ids);
     } catch (err) {
@@ -52,26 +52,25 @@ export default function Home() {
 
     try {
       // 1. Tell backend to create a Razorpay order
-      const orderResponse = await API.post(`/user/create-order`, { courseId });
+      const orderResponse = await API.post(`/api/v1/user/create-order`, { courseId });
       const { order, course } = orderResponse.data;
 
       // 2. Open the Razorpay Checkout Modal
       const options = {
-        key: 'rzp_test_TRdDeQtQB4ExgB', // Your test key here!
+        key: 'rzp_test_TRdDeQtQB4ExgB',
         amount: order.amount,
         currency: order.currency,
         name: "SkillForge Learning",
         description: `Purchasing: ${course.title}`,
         order_id: order.id,
-        // 👇 ADD THIS PREFILL BLOCK TO SKIP THE PHONE NUMBER SCREEN!
         prefill: {
             name: "Test Student",
             email: "student@skillforge.com",
-            contact: "9000090000" // A safe, non-sequential valid 10-digit format
+            contact: "9000090000"
         },
         handler: async function (response) {
           try {
-            await API.post(`/user/courses/${courseId}`);
+            await API.post(`/api/v1/user/courses/${courseId}`);
             setPurchasedIds((prev) => [...prev, courseId]);
             alert('Payment successful! Course purchased!');
           } catch (error) {
@@ -85,7 +84,6 @@ export default function Home() {
 
       const rzp = new window.Razorpay(options);
       
-      // Handle when user closes the window without paying
       rzp.on('payment.failed', function (response){
         alert("Payment failed or was cancelled.");
       });

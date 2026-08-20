@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import API from '../api/axios';
-import { ArrowLeft, PlayCircle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function CoursePlayer() {
   const { courseId } = useParams(); 
@@ -13,7 +13,7 @@ export default function CoursePlayer() {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const res = await API.get(`/user/courses/${courseId}`); 
+        const res = await API.get(`/api/v1/user/courses/${courseId}`); 
         setCourse(res.data.course);
       } catch (err) {
         console.error("Error fetching course details:", err);

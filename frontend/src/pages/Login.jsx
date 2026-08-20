@@ -20,7 +20,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const endpoint = role === 'admin' ? '/admin/login' : '/user/login';
+      const endpoint = role === 'admin' ? '/api/v1/admin/login' : '/api/v1/user/login';
       const res = await API.post(endpoint, { username, password });
       
       login(res.data.token, role);

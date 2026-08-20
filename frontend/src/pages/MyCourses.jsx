@@ -14,7 +14,7 @@ export default function MyCourses() {
 
   const fetchMyCourses = async () => {
     try {
-      const res = await API.get('/user/purchasedCourses');
+      const res = await API.get('/api/v1/user/purchasedCourses');
       setCourses(res.data.purchasedCourses || []);
     } catch (err) {
       console.error(err);

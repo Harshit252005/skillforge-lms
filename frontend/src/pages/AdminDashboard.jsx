@@ -11,18 +11,17 @@ export default function AdminDashboard() {
   const [price, setPrice] = useState('');
   const [thumbnail, setThumbnail] = useState(null);
   const [video, setVideo] = useState(null);
-  const [fileKey, setFileKey] = useState(Date.now()); // 👈 New state for video
+  const [fileKey, setFileKey] = useState(Date.now());
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState('');
  
-
   useEffect(() => {
     fetchAdminCourses();
   }, []);
 
   const fetchAdminCourses = async () => {
     try {
-      const res = await API.get('/admin/courses');
+      const res = await API.get('/api/v1/admin/courses');
       setCourses(res.data.courses || []);
     } catch (err) {
       console.error(err);
@@ -44,16 +43,15 @@ export default function AdminDashboard() {
       formData.append('thumbnail', thumbnail);
     }
     
-    // 👈 Append the video file to our FormData
     if (video) {
       formData.append('video', video);
     }
 
     try {
       if (editingId) {
-        await API.put(`/admin/courses/${editingId}`, formData);
+        await API.put(`/api/v1/admin/courses/${editingId}`, formData);
       } else {
-        await API.post('/admin/courses', formData);
+        await API.post('/api/v1/admin/courses', formData);
       }
 
       resetForm();
@@ -73,7 +71,7 @@ export default function AdminDashboard() {
   const handleDelete = async (courseId) => {
     if (!confirm('Are you sure you want to delete this course?')) return;
     try {
-      await API.delete(`/admin/courses/${courseId}`);
+      await API.delete(`/api/v1/admin/courses/${courseId}`);
       fetchAdminCourses();
     } catch (err) {
       alert('Failed to delete course');
@@ -87,7 +85,7 @@ export default function AdminDashboard() {
     setPrice('');
     setThumbnail(null);
     setVideo(null);
-    setFileKey(Date.now()); // 👈 Clear video on reset
+    setFileKey(Date.now());
     setError('');
   };
 
@@ -147,7 +145,6 @@ export default function AdminDashboard() {
             />
           </div>
 
-          {/* 👈 New Video Upload Input */}
           <div>
             <label className="block text-xs font-semibold uppercase text-slate-400 mb-1 flex items-center gap-1">
               <Video className="w-3 h-3" /> Main Course Video
