@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:3000/api/v1',
+  baseURL: 'https://skillforge-backend-y4iw.onrender.com',
 });
 
 API.interceptors.request.use((config) => {
