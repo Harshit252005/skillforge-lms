@@ -17,6 +17,9 @@ const {
 const redisClient = require("../redisClient");
 const { Course } = require("../db"); // Adjust path to your Course model if needed
 
+//AI controller
+const { explainConcept } = require("../controllers/aiController");
+
 // Define URLs (Routes)
 userRouter.post("/signup", signupUser);
 userRouter.post("/login", loginUser);
@@ -49,5 +52,6 @@ userRouter.get("/courses/:courseId", getCourseById);
 userRouter.post("/courses/:courseId", userMiddleware, purchaseCourse);
 userRouter.get("/purchasedCourses", userMiddleware, getPurchasedCourses);
 userRouter.post("/create-order", userMiddleware, createRazorpayOrder);
+userRouter.post("/ai/explain", userMiddleware, explainConcept);
 
 module.exports = { userRouter };
