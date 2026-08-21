@@ -1,7 +1,7 @@
 const { GoogleGenAI } = require('@google/genai');
 
-// The SDK automatically reads process.env.GOOGLE_API_KEY
-const ai = new GoogleGenAI(); 
+// Explicitly pass the key so it never fails to find it
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 const explainConcept = async (req, res) => {
     const { term, courseContext } = req.body;
