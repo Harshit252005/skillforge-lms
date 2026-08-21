@@ -15,7 +15,7 @@ const {
 
 // Import Redis Client
 const redisClient = require("../redisClient");
-const { Course } = require("../db"); // Adjust path to your Course model if needed
+const Course = require("../models/Course"); // Adjust path to your Course model if needed
 
 //AI controller
 const { explainConcept } = require("../controllers/aiController");
