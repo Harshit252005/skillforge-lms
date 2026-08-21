@@ -1,4 +1,5 @@
 const { GoogleGenAI } = require('@google/genai');
+
 const ai = new GoogleGenAI(); // Automatically picks up process.env.GEMINI_API_KEY
 
 const explainConcept = async (req, res) => {
