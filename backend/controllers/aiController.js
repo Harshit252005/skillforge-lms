@@ -12,7 +12,7 @@ const explainConcept = async (req, res) => {
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash', // Updated to stable supported model identifier
+            model: 'gemini-3.6-flash',
             contents: `You are a helpful AI tutor for an online learning platform. 
             A student watching a course about "${courseContext || 'programming'}" highlighted the term or phrase: "${term}". 
             Explain this term clearly, simply (ELI5 style - Explain Like I'm 5), and keep it concise (under 3 sentences) with a quick real-world analogy.`,
